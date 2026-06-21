@@ -17,12 +17,22 @@ class GameState(Enum):
 
 class PyroEngineApp:
     def __init__(self):
+        # TODO: Which variables need to be set from outside?
         self.logger = setup_logging()
         self.state = GameState.MAIN_MENU
+        self.limit_framerate = True
+        self.fps_limit = 60
 
     def run(self):
         self.logger.info("Creating raylib window...")
         pr.init_window(WIN_WIDTH, WIN_HEIGHT, "PYRO ENGINE v0.0.1")
+
+        # TODO: Own function/method?
+        if self.limit_framerate:
+            self.logger.info(f"Limiting framerate to {self.fps_limit} fps...")
+            pr.set_target_fps(self.fps_limit)
+        else:
+            self.logger.info("Framerate uncapped...")
 
         self.logger.info("Entering window loop...")
         while not pr.window_should_close():
