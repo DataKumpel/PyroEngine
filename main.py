@@ -7,7 +7,7 @@ WIN_HEIGHT = 450
 
 
 def main():
-    pyro = PyroEngineApp(WIN_WIDTH, WIN_HEIGHT)
+    pyro = PyroEngineApp(WIN_WIDTH, WIN_HEIGHT, fullscreen=False)
     pyro.run()
 
 

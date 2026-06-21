@@ -13,18 +13,25 @@ class GameState(Enum):
 
 
 class PyroEngineApp:
-    def __init__(self, win_width: int, win_height: int):
+    def __init__(self, win_width: int, win_height: int, fullscreen=False):
         # TODO: Which variables need to be set from outside?
         self.win_width = win_width
         self.win_height = win_height
+        self.fullscreen = fullscreen
         self.logger = setup_logging()
         self.state = GameState.MAIN_MENU
         self.limit_framerate = True
         self.fps_limit = 60
+        self.should_close = False
 
     def run(self):
         self.logger.info("Creating raylib window...")
         pr.init_window(self.win_width, self.win_height, "PYRO ENGINE v0.0.1")
+        if self.fullscreen:
+            pr.toggle_fullscreen()
+            self.win_width = pr.get_screen_width()
+            self.win_height = pr.get_screen_height()
+            self.logger.info(f"Fullscreen size: {self.win_width}x{self.win_height}")
 
         # TODO: Own function/method?
         if self.limit_framerate:
@@ -34,7 +41,7 @@ class PyroEngineApp:
             self.logger.info("Framerate uncapped...")
 
         self.logger.info("Entering window loop...")
-        while not pr.window_should_close():
+        while not self.should_close:
             match self.state:
                 case GameState.COMBAT     : self.handle_combat()
                 case GameState.EXPLORATION: self.handle_exploration()
@@ -48,8 +55,10 @@ class PyroEngineApp:
         self.logger.info("Engine shutdown complete!")
     
     def handle_main_menu(self):
-        menu = MainMenu(self.win_width, self.win_height)
+        menu = MainMenu(self.win_width, self.win_height, self.logger)
         menu.run()
+        if menu.should_close:
+            self.should_close = True
 
     def handle_combat(self):
         ...
