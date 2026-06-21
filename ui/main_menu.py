@@ -1,5 +1,5 @@
 import pyray as pr
-from .utility import center_text, layout_vertical
+from .utility import center_text, layout_vertical, layout_horizontal
 from logging import Logger
 
 
@@ -9,7 +9,8 @@ class MainMenu:
         self.win_width = win_width
         self.win_height = win_height
         self.logger = logger
-        self.layout = layout_vertical(pr.Rectangle(0, 0, win_width, win_height), 5)
+        self.layout = layout_horizontal(pr.Rectangle(0, 0, win_width, win_height), 3)
+        self.layout = layout_vertical(self.layout[1], 6)
 
     def run(self):
         while not self.should_close:
@@ -19,14 +20,14 @@ class MainMenu:
     def update(self):
         pr.begin_drawing()
         pr.clear_background(pr.BLACK)
-        # text = "Hello from PYRO ENGINE"
-        # text_x, text_y = center_text(text, self.win_width, self.win_height, 20)
-        # pr.draw_text(text, text_x, text_y, 20, pr.RED)
-        if(pr.gui_button(self.layout[1], "New Game")):
+
+        title_pos_x, title_pos_y = center_text("DARKFIELD", self.layout[1].width, self.layout[1].height, 34)
+        pr.draw_text("DARKFIELD", int(self.layout[1].x + title_pos_x), int(self.layout[1].y + title_pos_y), 34, pr.BLUE)
+        if(pr.gui_button(self.layout[2], "New Game")):
             self.logger.debug("Start a new game...")
-        if(pr.gui_button(self.layout[2], "Load Game")):
+        if(pr.gui_button(self.layout[3], "Load Game")):
             self.logger.debug("Load a saved game...")
-        if(pr.gui_button(self.layout[3], "Exit")):
+        if(pr.gui_button(self.layout[4], "Exit")):
             self.logger.debug("Exiting game...")
             self.should_close = True
 

@@ -13,3 +13,11 @@ def layout_vertical(area: pr.Rectangle, num_entries: int) -> list[pr.Rectangle]:
     for i in range(num_entries):
         entries.append(pr.Rectangle(area.x, area.y + i * height, area.width, height))
     return entries
+
+
+def layout_horizontal(area: pr.Rectangle, num_entries: int) -> list[pr.Rectangle]:
+    width = area.width // num_entries
+    entries = []
+    for i in range(num_entries):
+        entries.append(pr.Rectangle(area.x + i * width, area.y, width, area.height))
+    return entries
