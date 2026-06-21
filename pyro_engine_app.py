@@ -1,6 +1,7 @@
 import pyray as pr
 from enum import Enum, auto
 from utility import setup_logging
+from ui.main_menu import MainMenu
 
 
 class GameState(Enum):
@@ -40,7 +41,6 @@ class PyroEngineApp:
                 case GameState.GAME_OVER  : self.handle_game_over()
                 case GameState.MAIN_MENU  : self.handle_main_menu()
                 case GameState.MENU       : self.handle_menu()
-                case _: self.logger.warning(f"Undefined game-state ({self.state.name!r})!")
 
         self.logger.info("Closing raylib window...")
         pr.close_window()
@@ -48,10 +48,8 @@ class PyroEngineApp:
         self.logger.info("Engine shutdown complete!")
     
     def handle_main_menu(self):
-        pr.begin_drawing()
-        pr.clear_background(pr.BLACK)
-        pr.draw_text("Hello from PYRO ENGINE", 50, self.win_height // 2, 20, pr.RED)
-        pr.end_drawing()
+        menu = MainMenu(self.win_width, self.win_height)
+        menu.run()
 
     def handle_combat(self):
         ...
