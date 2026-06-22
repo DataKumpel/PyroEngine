@@ -1,7 +1,7 @@
 import pyray as pr
 from enum import Enum, auto
 from utility import setup_logging
-from ui.main_menu import MainMenu
+from ui.main_menu import MainMenu, MainMenuAction
 
 
 class GameState(Enum):
@@ -24,6 +24,9 @@ class PyroEngineApp:
         self.fps_limit = 60
         self.should_close = False
 
+        # Components:
+        self.main_menu = MainMenu(self.win_width, self.win_height, self.logger)
+
     def run(self):
         self.logger.info("Creating raylib window...")
         pr.init_window(self.win_width, self.win_height, "PYRO ENGINE v0.0.1")
@@ -41,7 +44,7 @@ class PyroEngineApp:
             self.logger.info("Framerate uncapped...")
 
         self.logger.info("Entering window loop...")
-        while not self.should_close:
+        while not self.should_close and not pr.window_should_close():
             match self.state:
                 case GameState.COMBAT     : self.handle_combat()
                 case GameState.EXPLORATION: self.handle_exploration()
@@ -55,10 +58,16 @@ class PyroEngineApp:
         self.logger.info("Engine shutdown complete!")
     
     def handle_main_menu(self):
-        menu = MainMenu(self.win_width, self.win_height, self.logger)
-        menu.run()
-        if menu.should_close:
-            self.should_close = True
+        match self.main_menu.update():
+            case MainMenuAction.NEW_GAME:
+                self.logger.debug("Start a new game...")
+            case MainMenuAction.LOAD_GAME:
+                self.logger.debug("Load a saved game...")
+            case MainMenuAction.EXIT:
+                self.logger.debug("Exiting game...")
+                self.should_close = True
+            case MainMenuAction.NONE:
+                pass
 
     def handle_combat(self):
         ...
