@@ -28,9 +28,6 @@ class MainMenu:
         return self.action
 
     def draw(self):
-        pr.begin_drawing()
-        pr.clear_background(pr.BLACK)
-
         title_pos_x, title_pos_y = center_text("DARKFIELD", self.layout[1].width, self.layout[1].height, 34)
         pr.draw_text("DARKFIELD", int(self.layout[1].x + title_pos_x), int(self.layout[1].y + title_pos_y), 34, pr.BLUE)
         
@@ -43,8 +40,6 @@ class MainMenu:
         if(pr.gui_button(self.layout[4], "Exit")):
             self.action = MainMenuAction.EXIT
             self.should_close = True
-
-        pr.end_drawing()
 
     def handle_input(self):
         if pr.is_key_pressed(pr.KeyboardKey.KEY_ESCAPE):

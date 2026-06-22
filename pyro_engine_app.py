@@ -2,6 +2,7 @@ import pyray as pr
 from enum import Enum, auto
 from utility import setup_logging
 from ui.main_menu import MainMenu, MainMenuAction
+from ui.screen_effects import ScreenFader
 
 
 class GameState(Enum):
@@ -26,6 +27,7 @@ class PyroEngineApp:
 
         # Components:
         self.main_menu = MainMenu(self.win_width, self.win_height, self.logger)
+        self.fader = ScreenFader(self.win_width, self.win_height, duration=2.0)
 
     def run(self):
         self.logger.info("Creating raylib window...")
@@ -45,6 +47,14 @@ class PyroEngineApp:
 
         self.logger.info("Entering window loop...")
         while not self.should_close and not pr.window_should_close():
+            # Update fader and listen to state changes:
+            new_state = self.fader.update()
+            if new_state is not None:
+                self.state = new_state
+
+            pr.begin_drawing()
+            pr.clear_background(pr.BLACK)
+            
             match self.state:
                 case GameState.COMBAT     : self.handle_combat()
                 case GameState.EXPLORATION: self.handle_exploration()
@@ -52,15 +62,25 @@ class PyroEngineApp:
                 case GameState.MAIN_MENU  : self.handle_main_menu()
                 case GameState.MENU       : self.handle_menu()
 
+            self.fader.draw()
+
+            pr.end_drawing()
+
         self.logger.info("Closing raylib window...")
         pr.close_window()
 
         self.logger.info("Engine shutdown complete!")
     
     def handle_main_menu(self):
+        # Don't interact while fading...
+        if self.fader.is_fading:
+            self.main_menu.update()
+            return
+
         match self.main_menu.update():
             case MainMenuAction.NEW_GAME:
                 self.logger.debug("Start a new game...")
+                self.fader.start_fade(GameState.EXPLORATION)
             case MainMenuAction.LOAD_GAME:
                 self.logger.debug("Load a saved game...")
             case MainMenuAction.EXIT:
