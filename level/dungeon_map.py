@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import TypedDict
 
 
 logger = logging.getLogger("PYRO_ENGINE")
@@ -39,3 +40,64 @@ class MapCell:
             entity_id=data.get(cls.serial[4], 0),
             collision=data.get(cls.serial[5], False),
         )
+    
+
+IntVec3 = tuple[int, int, int]
+
+
+class DungeonMapSerial(TypedDict):
+    map_name: str
+    cells: dict[IntVec3, MapCell]
+
+
+class DungeonMap:
+    def __init__(self, name: str = "New Map"):
+        self.name = name
+        self.cells: dict[IntVec3, MapCell] = {}
+
+    def __getitem__(self, pos: IntVec3):
+        return self.cells.get(pos)
+    
+    def __setitem__(self, pos: IntVec3, cell: MapCell):
+        self.cells[pos] = cell
+
+    def __delitem__(self, pos: IntVec3):
+        if pos in self.cells:
+            del self.cells[pos]
+
+    def save_to_json(self, filepath: str):
+        json_cells = {}
+        for (x, y, z), cell in self.cells.items():
+            key_str = f"{x},{y},{z}"
+            json_cells[key_str] = cell.to_dict()
+        
+        data: DungeonMapSerial = {
+            "map_name": self.name,
+            "cells": json_cells,
+        }
+
+        try:
+            with open(filepath, "w", encoding="utf-8") as file:
+                json.dump(data, file, indent=4)
+            logger.info(f"Map {self.name!r} saved to {filepath!r}...")
+        except IOError as ex:
+            logger.error(f"Error while saving map {self.name!r} to {filepath!r}!", exc_info=ex)
+    
+    @classmethod
+    def load_from_json(cls, filepath: str) -> DungeonMap | None:
+        try:
+            with open(filepath, encoding="utf-8") as file:
+                data: DungeonMapSerial = json.load(file)
+            
+            loaded_map = cls(name=data.get("map_name", "Unknown Map"))
+
+            for key_str, cell_dict in data.get("cells", {}).items():
+                x, y, z = [int(pos_str) for pos_str in key_str.split(",")]
+                loaded_map.cells[x, y, z] = MapCell.from_dict(cell_dict)
+
+            logger.info(f"Loading map {loaded_map.name!r} successfully from {filepath!r}...")
+            return loaded_map
+        except (IOError, json.JSONDecodeError, ValueError) as ex:
+            logger.error(f"Error loading map from {filepath!r}!", exc_info=ex)
+            return None
+        
