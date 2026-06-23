@@ -47,7 +47,7 @@ IntVec3 = tuple[int, int, int]
 
 class DungeonMapSerial(TypedDict):
     map_name: str
-    cells: dict[IntVec3, MapCell]
+    cells: dict[str, dict]
 
 
 class DungeonMap:
@@ -62,8 +62,7 @@ class DungeonMap:
         self.cells[pos] = cell
 
     def __delitem__(self, pos: IntVec3):
-        if pos in self.cells:
-            del self.cells[pos]
+        self.cells.pop(pos)
 
     def save_to_json(self, filepath: str):
         json_cells = {}
@@ -93,7 +92,7 @@ class DungeonMap:
 
             for key_str, cell_dict in data.get("cells", {}).items():
                 x, y, z = [int(pos_str) for pos_str in key_str.split(",")]
-                loaded_map.cells[x, y, z] = MapCell.from_dict(cell_dict)
+                loaded_map[x, y, z] = MapCell.from_dict(cell_dict)
 
             logger.info(f"Loading map {loaded_map.name!r} successfully from {filepath!r}...")
             return loaded_map
