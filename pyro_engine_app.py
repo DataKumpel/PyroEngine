@@ -11,6 +11,7 @@ class GameState(Enum):
     COMBAT = auto()
     MENU = auto()
     GAME_OVER = auto()
+    EDITOR = auto()
 
 
 class PyroEngineApp:
@@ -37,7 +38,7 @@ class PyroEngineApp:
         self.main_menu.win_width = self.win_width
         self.main_menu.win_height = self.win_height
         self.main_menu.update_layout()
-        
+
         self.fader.width = self.win_width
         self.fader.height = self.win_height
 
@@ -74,6 +75,7 @@ class PyroEngineApp:
                 case GameState.GAME_OVER  : self.handle_game_over()
                 case GameState.MAIN_MENU  : self.handle_main_menu()
                 case GameState.MENU       : self.handle_menu()
+                case GameState.EDITOR     : self.handle_editor()
 
             self.fader.draw()
 
@@ -96,6 +98,9 @@ class PyroEngineApp:
                 self.fader.start_fade(GameState.EXPLORATION)
             case MainMenuAction.LOAD_GAME:
                 self.logger.debug("Load a saved game...")
+            case MainMenuAction.MAP_EDITOR:
+                self.logger.debug("Entering map editor...")
+                self.fader.start_fade(GameState.EDITOR)
             case MainMenuAction.EXIT:
                 self.logger.debug("Exiting game...")
                 self.should_close = True
@@ -112,4 +117,7 @@ class PyroEngineApp:
         ...
     
     def handle_menu(self):
+        ...
+
+    def handle_editor(self):
         ...

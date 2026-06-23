@@ -7,6 +7,7 @@ from enum import Enum, auto
 class MainMenuAction(Enum):
     NEW_GAME = auto()
     LOAD_GAME = auto()
+    MAP_EDITOR = auto()
     EXIT = auto()
     NONE = auto()
 
@@ -28,7 +29,7 @@ class MainMenu:
     
     def update_layout(self):
         self.layout = layout_horizontal(pr.Rectangle(0, 0, self.win_width, self.win_height), 3)
-        self.layout = layout_vertical(self.layout[1], 6, 25)
+        self.layout = layout_vertical(self.layout[1], 7, 25)
 
     def draw(self):
         title_pos_x, title_pos_y = center_text("DARKFIELD", self.layout[1].width, self.layout[1].height, 34)
@@ -39,8 +40,11 @@ class MainMenu:
         
         if(pr.gui_button(self.layout[3], "Load Game")):
             self.action = MainMenuAction.LOAD_GAME
+
+        if(pr.gui_button(self.layout[4], "Map Editor")):
+            self.action = MainMenuAction.MAP_EDITOR
         
-        if(pr.gui_button(self.layout[4], "Exit")):
+        if(pr.gui_button(self.layout[5], "Exit")):
             self.action = MainMenuAction.EXIT
             self.should_close = True
 
