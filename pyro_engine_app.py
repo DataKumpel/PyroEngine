@@ -29,15 +29,28 @@ class PyroEngineApp:
         self.main_menu = MainMenu(self.win_width, self.win_height, self.logger)
         self.fader = ScreenFader(self.win_width, self.win_height, duration=2.0)
 
+    def update_window_size(self):
+        self.win_width = pr.get_screen_width()
+        self.win_height = pr.get_screen_height()
+
+        # Update components depending on screen size:
+        self.main_menu.win_width = self.win_width
+        self.main_menu.win_height = self.win_height
+        self.main_menu.update_layout()
+        
+        self.fader.width = self.win_width
+        self.fader.height = self.win_height
+
+        self.logger.info(f"Fullscreen size: {self.win_width}x{self.win_height}")
+
     def run(self):
         self.logger.info("Creating raylib window...")
         pr.init_window(self.win_width, self.win_height, "PYRO ENGINE v0.0.1")
+        
         if self.fullscreen:
             pr.toggle_fullscreen()
-            self.win_width = pr.get_screen_width()
-            self.win_height = pr.get_screen_height()
-            self.logger.info(f"Fullscreen size: {self.win_width}x{self.win_height}")
-
+            self.update_window_size()
+            
         # TODO: Own function/method?
         if self.limit_framerate:
             self.logger.info(f"Limiting framerate to {self.fps_limit} fps...")

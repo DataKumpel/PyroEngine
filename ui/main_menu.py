@@ -17,8 +17,7 @@ class MainMenu:
         self.win_width = win_width
         self.win_height = win_height
         self.logger = logger
-        self.layout = layout_horizontal(pr.Rectangle(0, 0, win_width, win_height), 3)
-        self.layout = layout_vertical(self.layout[1], 6, 25)
+        self.update_layout()
         self.action = MainMenuAction.NONE
 
     def update(self):
@@ -26,6 +25,10 @@ class MainMenu:
         self.draw()
         self.handle_input()
         return self.action
+    
+    def update_layout(self):
+        self.layout = layout_horizontal(pr.Rectangle(0, 0, self.win_width, self.win_height), 3)
+        self.layout = layout_vertical(self.layout[1], 6, 25)
 
     def draw(self):
         title_pos_x, title_pos_y = center_text("DARKFIELD", self.layout[1].width, self.layout[1].height, 34)
