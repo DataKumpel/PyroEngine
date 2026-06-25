@@ -3,6 +3,7 @@ from enum import Enum, auto
 from utility import setup_logging
 from ui.main_menu import MainMenu, MainMenuAction
 from ui.screen_effects import ScreenFader
+from editor.level_editor import LevelEditor, LevelEditorAction
 
 
 class GameState(Enum):
@@ -28,6 +29,7 @@ class PyroEngineApp:
 
         # Components:
         self.main_menu = MainMenu(self.win_width, self.win_height, self.logger)
+        self.level_editor = LevelEditor(win_width, win_height)
         self.fader = ScreenFader(self.win_width, self.win_height, duration=2.0)
 
     def update_window_size(self):
@@ -120,4 +122,13 @@ class PyroEngineApp:
         ...
 
     def handle_editor(self):
-        ...
+        # No interaction while fading:
+        if self.fader.is_fading:
+            self.level_editor.draw()
+            return
+        
+        match self.level_editor.update():
+            case LevelEditorAction.EXIT:
+                self.fader.start_fade(GameState.MAIN_MENU)
+        
+        self.level_editor.draw()
