@@ -38,6 +38,7 @@ class TileKind(Enum):
     WALL = auto()
     CEILING = auto()
     DETAIL = auto()
+    ERROR = auto()
 
 
 Color = tuple[int, int, int, int]  # RGBA
@@ -52,15 +53,16 @@ class TileDefinition(NamedTuple):
 
 
 # Some Default Tiles:
+MISSING_TILE         = TileDefinition(-1, "Missing Tile", TileKind.ERROR, (200, 55, 255, 255), False)
 DEFAULT_FLOOR_TILE   = TileDefinition(0, "Default Floor", TileKind.FLOOR, (133, 133, 133, 255), True)
-DEFAULT_WALL_TILE    = TileDefinition(0, "Default Wall", TileKind.WALL, (200, 55, 255, 255), True)
-DEFAULT_CEILING_TILE = TileDefinition(0, "Default Ceiling", TileKind.CEILING, (0, 170, 255, 255), True)
+DEFAULT_WALL_TILE    = TileDefinition(1, "Default Wall", TileKind.WALL, (200, 200, 200, 255), True)
+DEFAULT_CEILING_TILE = TileDefinition(2, "Default Ceiling", TileKind.CEILING, (0, 170, 255, 255), True)
 
 
 class TileCatalog:
     def __init__(self):
         self._tiles: dict[int, TileDefinition] = {}
-        self._default_tile = DEFAULT_FLOOR_TILE
+        self._error_tile = MISSING_TILE
     
     @classmethod
     def default(cls):
@@ -81,7 +83,7 @@ class TileCatalog:
         try:
             return self._tiles[tile_id]
         except KeyError:
-            return self._default_tile
+            return self._error_tile
     
     def all(self) -> list[TileDefinition]:
         return list(self._tiles.values())
