@@ -1,6 +1,7 @@
 import json
 import logging
 from typing import TypedDict
+from .tiles import TileRef
 
 
 logger = logging.getLogger("PYRO_ENGINE")
@@ -13,10 +14,10 @@ class MapCell:
     serial = "base wall ceil detail entity".split()
 
     def __init__(self, 
-                 base_layer=0, 
-                 wall_layer=0, 
-                 ceiling_layer=0, 
-                 detail_layer: list | None = None, 
+                 base_layer: TileRef | None = None, 
+                 wall_layer: TileRef | None = None, 
+                 ceiling_layer: TileRef | None = None, 
+                 detail_layer: list[TileRef] | None = None, 
                  entity_id=0):
         self.base_layer = base_layer
         self.wall_layer = wall_layer
@@ -26,20 +27,20 @@ class MapCell:
 
     def to_dict(self) -> dict:
         return {
-            self.serial[0]: self.base_layer,
-            self.serial[1]: self.wall_layer,
-            self.serial[2]: self.ceiling_layer,
-            self.serial[3]: self.detail_layer,
+            self.serial[0]: self.base_layer.to_dict(),
+            self.serial[1]: self.wall_layer.to_dict(),
+            self.serial[2]: self.ceiling_layer.to_dict(),
+            self.serial[3]: [layer.to_dict() for layer in self.detail_layer],
             self.serial[4]: self.entity_id,
         }
     
     @classmethod
     def from_dict(cls, data: dict) -> "MapCell":
         return cls(
-            base_layer=data.get(cls.serial[0], 0),
-            wall_layer=data.get(cls.serial[1], 0),
-            ceiling_layer=data.get(cls.serial[2], 0),
-            detail_layer=data.get(cls.serial[3], []),
+            base_layer=TileRef.from_dict(data.get(cls.serial[0])),
+            wall_layer=TileRef.from_dict(data.get(cls.serial[1])),
+            ceiling_layer=TileRef.from_dict(data.get(cls.serial[2])),
+            detail_layer=[TileRef.from_dict(detail) for detail in data.get(cls.serial[3], [])],
             entity_id=data.get(cls.serial[4], 0),
         )
     
