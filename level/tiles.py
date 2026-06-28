@@ -1,5 +1,5 @@
 from typing import NamedTuple
-from enum import Enum
+from enum import Enum, auto
 
 
 class CardinalRotation(Enum):
@@ -31,3 +31,51 @@ class TileRef(NamedTuple):
             CardinalRotation(data.get("rotation", 0)),
         )
     #===== SERIALIZATION =====
+
+
+class TileKind(Enum):
+    FLOOR = auto()
+    WALL = auto()
+    CEILING = auto()
+    DETAIL = auto()
+
+
+Color = tuple[int, int, int, int]  # RGBA
+
+
+class TileDefinition(NamedTuple):
+    tile_id: int
+    name: str
+    kind: TileKind
+    color: Color
+    solid: bool
+
+
+class TileCatalog:
+    def __init__(self):
+        self._tiles: dict[int, TileDefinition] = {}
+    
+    @classmethod
+    def default(cls):
+        catalog = cls()
+        # TODO: Register placeholders
+        return catalog
+
+    def register(self, tile: TileDefinition):
+        # Check if already registered:
+        for reg_tile in self._tiles.values():
+            if reg_tile.tile_id == tile.tile_id:
+                return
+        
+        self._tiles[len(self._tiles)] = tile
+
+    def __getitem__(self, tile_id: int):
+        try:
+            return self._tiles[tile_id]
+        except KeyError:
+            # TODO: Return default tile
+            ...
+    
+    def all(self) -> list[TileDefinition]:
+        return list(self._tiles.values())
+    
