@@ -51,14 +51,23 @@ class TileDefinition(NamedTuple):
     solid: bool
 
 
+# Some Default Tiles:
+DEFAULT_FLOOR_TILE   = TileDefinition(0, "Default Floor", TileKind.FLOOR, (133, 133, 133, 255), True)
+DEFAULT_WALL_TILE    = TileDefinition(0, "Default Wall", TileKind.WALL, (200, 55, 255, 255), True)
+DEFAULT_CEILING_TILE = TileDefinition(0, "Default Ceiling", TileKind.CEILING, (0, 170, 255, 255), True)
+
+
 class TileCatalog:
     def __init__(self):
         self._tiles: dict[int, TileDefinition] = {}
+        self._default_tile = DEFAULT_FLOOR_TILE
     
     @classmethod
     def default(cls):
         catalog = cls()
-        # TODO: Register placeholders
+        catalog.register(DEFAULT_FLOOR_TILE)
+        catalog.register(DEFAULT_WALL_TILE)
+        catalog.register(DEFAULT_CEILING_TILE)
         return catalog
 
     def register(self, tile: TileDefinition):
@@ -72,8 +81,7 @@ class TileCatalog:
         try:
             return self._tiles[tile_id]
         except KeyError:
-            # TODO: Return default tile
-            ...
+            return self._default_tile
     
     def all(self) -> list[TileDefinition]:
         return list(self._tiles.values())
