@@ -63,11 +63,10 @@ class TileCatalog:
 
     def register(self, tile: TileDefinition):
         # Check if already registered:
-        for reg_tile in self._tiles.values():
-            if reg_tile.tile_id == tile.tile_id:
-                return
+        if tile.tile_id in self._tiles:
+            raise ValueError(f"Tile with id={tile.tile_id} already registered!")
         
-        self._tiles[len(self._tiles)] = tile
+        self._tiles[tile.tile_id] = tile
 
     def __getitem__(self, tile_id: int):
         try:
