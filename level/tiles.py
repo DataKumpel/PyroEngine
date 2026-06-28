@@ -17,6 +17,7 @@ class TileRef(NamedTuple):
     tile_id: int
     rotation: CardinalRotation
 
+    #===== SERIALIZATION =====
     def to_dict(self) -> dict:
         return {
             "id": self.tile_id,
@@ -25,18 +26,8 @@ class TileRef(NamedTuple):
     
     @classmethod
     def from_dict(cls, data: dict):
-        rotation = CardinalRotation.NORTH
-        match data.get("rotation"):
-            case 0:
-                rotation = CardinalRotation.NORTH
-            case 90:
-                rotation = CardinalRotation.WEST
-            case 180:
-                rotation = CardinalRotation.SOUTH
-            case 270:
-                rotation = CardinalRotation.EAST
-        
         return cls(
-            data.get("id"),
-            rotation,
+            data.get("id", 0),
+            CardinalRotation(data.get("rotation", 0)),
         )
+    #===== SERIALIZATION =====

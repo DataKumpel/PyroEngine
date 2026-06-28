@@ -27,19 +27,22 @@ class MapCell:
 
     def to_dict(self) -> dict:
         return {
-            self.serial[0]: self.base_layer.to_dict(),
-            self.serial[1]: self.wall_layer.to_dict(),
-            self.serial[2]: self.ceiling_layer.to_dict(),
+            self.serial[0]: self.base_layer.to_dict() if self.base_layer else None,
+            self.serial[1]: self.wall_layer.to_dict() if self.wall_layer else None,
+            self.serial[2]: self.ceiling_layer.to_dict() if self.ceiling_layer else None,
             self.serial[3]: [layer.to_dict() for layer in self.detail_layer],
             self.serial[4]: self.entity_id,
         }
     
     @classmethod
     def from_dict(cls, data: dict) -> "MapCell":
+        base = data.get(cls.serial[0])
+        wall = data.get(cls.serial[1])
+        ceiling = data.get(cls.serial[2])
         return cls(
-            base_layer=TileRef.from_dict(data.get(cls.serial[0])),
-            wall_layer=TileRef.from_dict(data.get(cls.serial[1])),
-            ceiling_layer=TileRef.from_dict(data.get(cls.serial[2])),
+            base_layer=TileRef.from_dict(base) if base is not None else None,
+            wall_layer=TileRef.from_dict(wall) if wall is not None else None,
+            ceiling_layer=TileRef.from_dict(ceiling) if ceiling is not None else None,
             detail_layer=[TileRef.from_dict(detail) for detail in data.get(cls.serial[3], [])],
             entity_id=data.get(cls.serial[4], 0),
         )
